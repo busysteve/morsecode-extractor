@@ -1,16 +1,26 @@
-{
+#!/bin/awk -f 
+
+BEGIN{
+	if( cw_shift == 0 )
+		cw_shift = ENVIRON["CW_SHIFT"]
+		
+	if( cw_shift == 0 )
+		cw_shift = 1
+		
+	#print "cw_shift = " cw_shift
+}{
 
 	#print tone " - " gap
 
 	if( gap > 0 && tone > 0 )
 	{
-		tone_start = 10
-		tone_thresh = 10
+		tone_start = (10 * cw_shift)
+		tone_thresh = (10 * cw_shift)
 		tone_dit = tone_start
 		tone_dah = tone_start + tone_thresh
 				
-		gap_start = 10
-		gap_thresh = 90
+		gap_start = (10 * cw_shift)
+		gap_thresh = (90 * cw_shift)
 		gap_letter = gap_start
 		gap_word = gap_start + gap_thresh
 				
@@ -20,9 +30,11 @@
 			printf("-")
 			
 		if( gap >= gap_letter && gap <= gap_word )
-			printf(" ")
+			printf("\n")
 		else if( gap > gap_word )
-			printf("|")
+			printf("\n\n")
+		
+		system("")
 			
 		gap = 0
 		tone = 0
@@ -57,5 +69,6 @@
 
 }
 END {
+	print ""
 }
 

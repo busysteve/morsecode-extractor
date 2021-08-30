@@ -1,3 +1,5 @@
+#!/bin/awk -f 
+
 BEGIN{
 txt2mc["A"] = ".-"
 txt2mc["B"] = "-..."
@@ -101,10 +103,12 @@ mc2txt[".--.-."]="@"
 
 
 }{
-	if( NF > 0 )
+	if( length($0) > 0 )
 		printf( mc2txt[$1] )
 	else
 		printf( " " )
+			
+	system("")
 }END{
 	print ""
 }
