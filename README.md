@@ -10,6 +10,7 @@ awk -f morsecode.awk
 
 
 The fftw3_stream parameters are as follows:
+
 fftw3_stream [input sample rate] [slice segments] [levels to dig for tones] [tone min freq] [tone max freq]
 
 
