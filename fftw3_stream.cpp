@@ -40,8 +40,11 @@ int main( int argc, char** argv ) {
 
 	int dig = atoi( argv[3] );
 
-        int freq_min = atoi( argv[4] ); //min pass frequency
-        int freq_max = atoi( argv[5] ); //max pass frequency
+        int freq_cen = atoi( argv[4] ); //min pass frequency
+        int freq_wid = atoi( argv[5] ); //max pass frequency
+
+        int freq_min = freq_cen - freq_wid; //min pass frequency
+        int freq_max = freq_cen + freq_wid; //max pass frequency
 
         double dF = Fs / N;
         double T = 1 / Fs; //sample time 
