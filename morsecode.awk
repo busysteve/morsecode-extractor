@@ -103,8 +103,14 @@ mc2txt[".--.-."]="@"
 
 
 }{
-	if( length($0) > 0 )
-		printf( mc2txt[$1] )
+	if( length($1) > 0 )
+	{
+		output =  mc2txt[$1] 
+		if( output == "" )
+			printf( "#" )
+		else
+			printf( output )
+	}
 	else
 		printf( " " )
 			

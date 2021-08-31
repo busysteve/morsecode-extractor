@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <array>
 #include <complex>
@@ -42,6 +43,12 @@ int main( int argc, char** argv ) {
 
         int freq_cen = atoi( argv[4] ); //min pass frequency
         int freq_wid = atoi( argv[5] ); //max pass frequency
+
+	double freq_min_db = atof( argv[6] ); // min db
+
+	double freq_slope = atof( argv[7] ); // min db
+
+	double gnu_plot_report = atoi( argv[8] ); // min db
 
         int freq_min = freq_cen - freq_wid; //min pass frequency
         int freq_max = freq_cen + freq_wid; //max pass frequency
@@ -137,27 +144,89 @@ int main( int argc, char** argv ) {
 */
 
 		vector<pair<double, double> > order(N);
-
+		map<double, double> spectrum;
+		map<double, double>::iterator spectrum_it;
+		
 		for ( int i=0; i < N; i++ )
+		{
 		    order[i] = make_pair( v[i], ff[i] );
-
+		    spectrum[ff[i]] = v[i];
+		}
+		
 		sort( order.begin(), order.end(), ordering() );
 
 		//auto m = max( order.begin(), order.end(), ordering() );
 		
-		for( int i=0; i < dig; i++ )
+		if( gnu_plot_report > 0 )
 		{
-			if( i > 0 )
+			cout << "set term png" << std::endl;
+			cout << "set output printme.png" << std::endl;
+
+			cout << "plot '-' using 1:2" << std::endl;
+
+			for (i = 0; i < ((N / 2) - 1); i++)
+
+			{
+
+				cout << ff[i] << " " << v[i] << std::endl;
+
+			}
+
+			break;
+		}
+		
+		for( int count=0,i=0; i < order.size() && count < dig; i++ )
+		{
+			if( count > 0 )
 				cout << ",";
 				
+			double freq = order[i].second;
+			
 			if( order[i].second >= freq_min && order[i].second <= freq_max )
 			{
-				cout << order[i].first << ":" << order[i].second;
+				double freq_db = order[i].first;
+				double freq_left_db=0;
+				double freq_right_db=0;
+				double freq_left=1;
+				double freq_right=1;
+				
+				
+				if( freq_db >= freq_min_db )
+				{
+					spectrum_it = spectrum.find( freq );
+					if( spectrum_it != spectrum.begin() )
+					{
+						spectrum_it--;				
+						freq_left = spectrum_it->first;
+						freq_left_db = spectrum_it->second;
+						spectrum_it++;
+					}
+					
+					if( spectrum_it++ != spectrum.end() )
+					{
+						freq_right = spectrum_it->first;
+						freq_right_db = spectrum_it->second;
+					}
+					
+					
+						
+					//double slope_left = (freq_db - freq_left_db) / ( freq - freq_left ); 
+					//double slope_right = (freq_right_db - freq_db) / ( freq_right - freq ); 
+					
+					double slope_left = (freq_db - freq_left_db); 
+					double slope_right = (freq_db - freq_right_db); 
+					
+					if( slope_left >= freq_slope && slope_right >= freq_slope )
+					{
+						cout << order[i].first << ":" << order[i].second << "     " << slope_left << "   " << slope_right;				
+						count++;
+					}
+				}
 			}
 			else
 			{
 				//cout << "0:0";
-				break;
+				//break;
 			}
 		}
 		cout << endl;
