@@ -8,11 +8,35 @@
 using namespace std;
 using namespace dlib;
 
-using in_type =  long;
+using in_type =  double;
 using lab_type = unsigned long;
 
 
-const int input_count = 5;
+#ifndef _INPUTS_
+#define _INPUTS_ 5
+#endif
+
+#ifndef _LAYER1_
+#define _LAYER1_ _INPUTS_
+#endif
+
+#ifndef _LAYER2_
+#define _LAYER2_ _LAYER1_
+#endif
+
+#ifndef _LAYER3_
+#define _LAYER3_ _LAYER2_
+#endif
+
+#ifndef _LAYER4_
+#define _LAYER4_ _LAYER3_
+#endif
+
+const int input_count = _INPUTS_;
+const int layer1_count = _LAYER1_;
+const int layer2_count = _LAYER2_;
+const int layer3_count = _LAYER3_;
+const int layer4_count = _LAYER4_;
 
 
 void load_morse_code_training( 
@@ -200,23 +224,58 @@ int main(int argc, char** argv) try
 //                                >>>>>>>>>>>>;
 
 
-#if 1
+#if ( CUSTOMIZED == 4 )
+
     using net_type = loss_multiclass_log<
                                 fc<5, 
-                                relu<fc<6,   
-                                htan<fc<8,   
-                                htan<fc<input_count,  
+                                LAYER4TYPE<fc<layer4_count,   
+                                LAYER3TYPE<fc<layer3_count,   
+                                LAYER2TYPE<fc<layer2_count,   
+                                LAYER1TYPE<fc<layer1_count,   
+                                INPUTTYPE<fc<input_count,  
                                 input<matrix<in_type>>
-                                >>>>>>>>;
-#else
+                                >>>>>>>>>>>>;
                                 
+#elif ( CUSTOMIZED == 3 )
+
     using net_type = loss_multiclass_log<
                                 fc<5, 
-                                relu<fc<6,   
-                                htan<fc<8,   
+                                LAYER3TYPE<fc<layer3_count,   
+                                LAYER2TYPE<fc<layer2_count,   
+                                LAYER1TYPE<fc<layer1_count,   
+                                INPUTTYPE<fc<input_count,  
+                                input<matrix<in_type>>
+                                >>>>>>>>>>;
+                                
+#elif ( CUSTOMIZED == 2 )
+
+    using net_type = loss_multiclass_log<
+                                fc<5, 
+                                LAYER2TYPE<fc<layer2_count,   
+                                LAYER1TYPE<fc<layer1_count,   
+                                INPUTTYPE<fc<input_count,  
+                                input<matrix<in_type>>
+                                >>>>>>>>;
+                                
+#elif ( CUSTOMIZED == 1 )
+
+    using net_type = loss_multiclass_log<
+                                fc<5, 
+                                LAYER1TYPE<fc<layer1_count,   
+                                INPUTTYPE<fc<input_count,  
+                                input<matrix<in_type>>
+                                >>>>>>;
+                                
+#else                           
+     
+    using net_type = loss_multiclass_log<
+                                fc<5, 
+                                htan<fc<layer2_count,   
+                                htan<fc<layer1_count,   
                                 htan<fc<input_count,  
                                 input<matrix<in_type>>
                                 >>>>>>>>;
+                                
 #endif
 
                                 
@@ -234,6 +293,31 @@ int main(int argc, char** argv) try
     
     if( train_me == true )
     {
+
+#define QUOTE(q) Q(q)
+#define Q(q) #q
+
+    	    #ifdef CUSTOMIZED
+    	    	cerr << endl << endl << "Input " << "  = " << input_count << "\t" << QUOTE(INPUTTYPE) << endl;
+    	    #endif
+	    #if( CUSTOMIZED >= 1 )
+    	    	cerr << "Layer " << 1 << " = " << layer1_count << "\t" << QUOTE(LAYER1TYPE) << endl;
+    	    #endif
+	    #if( CUSTOMIZED >= 2 )
+    	    	cerr << "Layer " << 2 << " = " << layer2_count << "\t" << QUOTE(LAYER2TYPE) << endl;
+    	    #endif
+	    #if( CUSTOMIZED >= 3 )
+    	    	cerr << "Layer " << 3 << " = " << layer3_count << "\t" << QUOTE(LAYER3TYPE) << endl;
+    	    #endif
+	    #if( CUSTOMIZED >= 4 )
+    	    	cerr << "Layer " << 4 << " = " << layer4_count << "\t" << QUOTE(LAYER4TYPE) << endl;
+    	    #endif
+    	    #ifdef CUSTOMIZED
+    	    	cerr << endl << endl << flush;
+    	    #endif
+    	    
+    	    	
+    
           load_morse_code_training( training_images, training_labels, testing_images, testing_labels, training_count, testing_count);
           
 	    // And then train it using the MNIST data.  The code below uses mini-batch stochastic

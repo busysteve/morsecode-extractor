@@ -1,0 +1,3 @@
+./build_nn.sh "custom=3 inputs=5 layer1=12 layer2=12 layer3=12 inputtype=htan layer1type=htan layer2type=htan layer3type=htan"
+
+

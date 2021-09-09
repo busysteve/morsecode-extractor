@@ -1,0 +1,12 @@
+
+morsecode-nn: morsecode-nn.o dlib_source.o Makefile.no-cuda2 
+	g++ -omp -std=c++11 -DDLIB_USE_LAPACK -DDLIB_USE_BLAS -o morsecode-nn morsecode-nn.o dlib_source.o -ldlib -lblas -llapack -lX11 -lpthread -ldl
+	#g++ -omp -std=c++11 -DDLIB_USE_LAPACK -DDLIB_USE_BLAS -o morsecode-nn morsecode-nn.o -L/home/smathews/dlib.d/dlib -ldlib -lblas -llapack -lX11 -lXrender -lpthread -ldl
+
+morsecode-nn.o: morsecode-nn.cpp Makefile.no-cuda2
+	g++ -omp -std=c++11 -DDLIB_USE_LAPACK -DDLIB_USE_BLAS -c morsecode-nn.cpp -o morsecode-nn.o -I/home/smathews/dlib-19.22/
+
+dlib_source.o: /home/smathews/dlib-19.22/dlib/all/source.cpp Makefile.no-cuda2
+	g++ -omp -std=c++11 -DDLIB_USE_LAPACK -DDLIB_USE_BLAS -c /home/smathews/dlib-19.22/dlib/all/source.cpp -o dlib_source.o -I/home/smathews/dlib-19.22/
+
+
