@@ -1,43 +1,59 @@
 #!/bin/awk -f
 BEGIN{
+	slot_count = ENVIRON["CW_SLOTS"]
+
+	if( slot_count < 1 )
+		slot_count = 5
+
 }
 {
+
 	if( length( $0 ) > 0 )
 	{
-
-
-		data[8] = data[7]
-		data[7] = data[6]
-		data[6] = data[5]
-		data[5] = data[4]
-		data[4] = data[3]
-		data[3] = data[2]
-		data[2] = data[1]
-		data[1] = $1
-
-		val = data[8]
+		val = $1
 
 		if( length( val ) > 0 )
 		{
+			slot_data( val )
 			process_data( val )
 		}
 
 
 	}
 
-	fflush(stdout)
+	system("")
 }
 END{
 	for( i in data )
 		process_data( data[i] )
 }
 
+func slot_data( val )
+{
+
+	if( val > 0 )
+	{
+		for( s = slot_count; s > 0; s-- )
+                	data[s+1] = data[s]
+                data[1] = val
+	}
+	else if( val < 0 ) 
+	{
+		for( s = slot_count; s > 0; s-- )
+                	data[-(s+1)] = data[-s]
+                data[-1] = val
+	}
+
+
+}
+
+
 func process_data( val )
 {
 
 			min_pos = 9999
 			max_pos = 0
-			min_neg = -9999
+			min_neg = 9999
 			max_neg = 0
 
 			for( i in data )
@@ -52,18 +68,32 @@ func process_data( val )
 				}
 				else if( dat < 0 )
 				{
-					if( min_neg < dat ) min_neg = dat
+					dat = -dat
+					
+					if( min_neg > dat ) min_neg = dat
 
-					if( max_neg > dat ) max_neg = dat
+					if( max_neg < dat ) 
+					{
+						max_neg = dat
+						
+						#if( max_neg < -( min_neg * 5 ) ) max_neg = -( min_pos * 5 )
+					}
 				}
 			}
 
 			avg_pos = ( min_pos + max_pos ) / 2
 			avg_neg = ( min_neg + max_neg ) / 2
 
+
+			#std_pos = stddev_pos(data)
+			#std_neg = stddev_neg(data)
+			
+
+
 			if( val > 0 )
 			{
-				if( val >= avg_pos ) 
+				#if( val > avg_pos ) 
+				if( val > max_pos*(min_pos/max_pos)*2.3 )
 					printf( "-" )
 				else 
 					printf( "." )
@@ -71,13 +101,16 @@ func process_data( val )
 
 			if( val < 0 )
 			{
-				if( val <= avg_neg )
+				val = -val;
+				
+				if( val > max_neg*(min_neg/max_neg)*2 )
 				{
-					print_data_state( min_pos, max_pos, min_neg, max_neg, avg_pos, avg_neg )
+					#print_data_state( min_pos, max_pos, min_neg, max_neg, avg_pos, avg_neg )
 					printf( "\n" )
 				}
-				else if( val < (avg_neg)+(max_neg/2) ) 
-				{ printf( "\n" ) }
+				#if( val >= ( max_neg * (min_neg / max_neg)*6 ) ) { printf( "\n" ) }
+				if( val >= ( max_neg ) ) { printf( "\n" ) }
+				#if( val >= ( max_neg*(min_neg/max_neg)*6 ) ) { printf( "\n" ) }
 			}
 
 

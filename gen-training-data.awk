@@ -1,5 +1,25 @@
 #!/bin/awk -f
 BEGIN{
+
+
+	inputs = ENVIRON["INPUT_COUNT"]
+	if( inputs <= 0 )
+		inputs = 10
+		
+	factor = ENVIRON["FACTOR"]
+	if( factor <= 0 )
+		factor = 3
+		
+
+	pulse_width = ENVIRON["PULSE_WIDTH"]
+	if( pulse_width <= 0 )
+		pulse_width = 10
+
+	gap_width = ENVIRON["GAP_WIDTH"]
+	if( gap_width <= 0 )
+		gap_width = $pulse_width
+
+
 txt2mc["A"] = ".-"
 txt2mc["B"] = "-..."
 txt2mc["C"] = "-.-."
@@ -59,13 +79,12 @@ txt2mc[" "] = ""
 
         srand( seed )
 
-	pulse_width = 10
 
 	pulse_times["."] = pulse_width
-	pulse_times["-"] = pulse_width*2
-	pulse_times["L"] = -(pulse_width*pulse_width)
-	pulse_times["G"] = -(pulse_width*2)
-	pulse_times["g"] = -(pulse_width)
+	pulse_times["-"] = pulse_width*3
+	pulse_times["g"] = g = -(gap_width)
+	pulse_times["G"] = G = -((-g)*6)
+	pulse_times["L"] = -((-G)*5)
 
 	pulse_map["-"] = 4
 	pulse_map["."] = 3
@@ -93,11 +112,19 @@ txt2mc[" "] = ""
 	}
 
 	#    0123456789
-	#q = "   "	
+	q = ""	
 	#q = "    "	
-	q = "          "	
+	#q = "          "	
+
+	for( i=1; i <= inputs; i++ )
+		q = q "0"
+
 
 	split( q, queue, "" )
+
+	
+	
+
 
 	qlen = length(queue)
 
@@ -125,7 +152,7 @@ txt2mc[" "] = ""
 			push_queue(queue, v )
 		}
 
-		w = (  j%4 ? "G" : "L")
+		w = (  j%2 ? "G" : "L")
 		push_queue(queue, w ) 
 	}
 
@@ -134,14 +161,15 @@ txt2mc[" "] = ""
 
 func push_queue(q,val)
 {
+	
 	l = length(q)
 
 	fudge++
-	#fiddle = sin( fudge / 360/2 ) * pulse_width/2
-	fiddle = rand() * pulse_width/4
 
-	#print fiddle
+	fiddle = ( .5 + rand() * .75 ) * factor
 
+
+	#roll queue
 	for( i=1; i< l; i++)
 		q[i] = q[i+1]
 
@@ -149,15 +177,16 @@ func push_queue(q,val)
 
 	printf( pulse_map[ q[1] ] )
 
-	L = pulse_times["L"]
-
-	for( e in q )
+	#for( e in q )
+	for( i=1; i <=l; i++ )
 	{
-		v = pulse_times[q[e]]
-		r = (rand()-0.5) * .8
-		v += v*r
-		printf( "\t%d", v );
-		#printf( "\t%d", pulse_times[ q[e]]+(((rand()*3)+1) ) );
+		v = pulse_times[q[i]] * fiddle
+		r = ( (.5+(rand()-0.5) * factor * 1.5 ) ) 
+
+		#print v "  :  " r
+
+		printf( "\t%d", v + r );
+		
 	}
 
 	print ""
