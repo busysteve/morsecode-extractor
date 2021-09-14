@@ -35,3 +35,10 @@ go to fftw.org and build and install their lib.  Then compile fftw3_stream.cpp a
 g++ -std=c++11 -o fftw3_stream fftw3_stream.cpp -lfftw3 -lm
 
 
+
+Latest is supported by running:
+
+CW_DEEP=22; ./ffwav2raw.sh 50_CW.wav | ./fftw3_stream 8000 80 1 600 80 .25 0.0 0 | ./sift-peak.awk | ./post-peaks.awk | ./queue_for_nn_input.awk | ./normalize.awk | ./comp.awk | ./interpret.awk | ./morsecode.awk
+
+Where CW_WIDE=22 is used as the statistical prescan queue depth by queue_for_nn_input.awk
+
