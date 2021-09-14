@@ -1,7 +1,18 @@
-#!/bin/awk -f
+#!/bin/awk -f  
 BEGIN{
-	wid = 10
-	split( "0000000000", input, "" )
+
+	wide = ENVIRON["CW_WIDE"]
+
+	if( wide == "" )
+		wide = 20
+
+	w = "0"
+
+	for( i=1; i<wide; i++ )
+		w = w "0"
+
+	split( w, input, "" )
+
 
 }{
 	push_queue( input, $1 )
