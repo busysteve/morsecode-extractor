@@ -1,7 +1,7 @@
 #!/bin/awk -f  
 BEGIN{
 
-	wide = ENVIRON["CW_WIDE"]
+	wide = ENVIRON["CW_DEEP"]
 
 	if( wide == "" )
 		wide = 20
